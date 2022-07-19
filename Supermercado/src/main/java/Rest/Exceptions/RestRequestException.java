@@ -1,6 +1,7 @@
 package Rest.Exceptions;
 
 public class RestRequestException extends Exception {
+	private static final long serialVersionUID = 1L;
 
 	public RestRequestException() {
 		// TODO Auto-generated constructor stub

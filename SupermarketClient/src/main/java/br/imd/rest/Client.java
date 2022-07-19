@@ -32,8 +32,9 @@ public class Client {
 			System.out.println("USER: " + username);
 			System.out.println("0 - Quit Application.");
 			System.out.println("1 - List Sales.");
-			System.out.println("2 - Subscribe to recieve updates on a product.");
-			System.out.println("3 - Unsubscribe from updates on product.");
+			System.out.println("2 - List Subscriptions.");
+			System.out.println("3 - Subscribe to recieve updates on a product.");
+			System.out.println("4 - Unsubscribe from updates on product.");
 			System.out.println("==========================================");
 			option = sc.nextInt();
 			sc.nextLine();
@@ -42,12 +43,15 @@ public class Client {
 				listSales();
 			}
 			else if(option == 2) {
+				listSubscriptions();
+			}
+			else if(option == 3) {
 				String product;
 				System.out.println("Inform the name of the product you want to recieve updates for: ");
 				product = sc.nextLine();
 				subscribeProduct(product);
 			}
-			else if(option == 3) {
+			else if(option == 4) {
 				String product;
 				System.out.println("Inform the name of the product you want to stop recieving updates for: ");
 				product = sc.nextLine();
@@ -87,6 +91,13 @@ public class Client {
 		System.out.println(response);
 	}
 	
+	public static void listSubscriptions() throws RestRequestException {
+		String uri = "http://localhost:8080/Supermarket/sale/listSubscriptions/"+username;
+		String response = HttpUtils.httpGetRequest(uri, headerParams);
+		
+		System.out.println(response);
+	}
+	
 	public static void subscribeProduct(String product) throws RestRequestException {	
 		String uri = "http://localhost:8080/Supermarket/sale/subscribe/"
 				+ username + "/"
@@ -96,9 +107,10 @@ public class Client {
 		System.out.println(response);		
 	}
 	
-	public static void unsubscribeProduct(String groupname) throws RestRequestException {		
-		String uri = "http://localhost:8080/RestServer/restapi/groupServer/joinGroup"
-						+ "?groupname="+groupname+"&username="+username;
+	public static void unsubscribeProduct(String product) throws RestRequestException {		
+		String uri = "http://localhost:8080/Supermarket/sale/unsubscribe/"
+				+ username + "/"
+				+ product;
 		String response = HttpUtils.httpGetRequest(uri, headerParams);
 		
 		System.out.println(response);

@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -43,7 +42,26 @@ public class SupermarketController {
 		String response = HttpUtils.httpGetRequest(uri, headerParams);
 		
 		System.out.println(response);
+		
 		return response;
+	}
+	
+	@RequestMapping(value = "sale/listSubscriptions/{username}", method = RequestMethod.GET)
+	public String listSubscriptions(@PathVariable("username") String username) throws RestRequestException {
+		String returnText = "=====> Your Subscriptions: \n";
+		
+		ArrayList<String> userSubscriptions = UserManager.getUserSubscriptions(username);
+		
+		if(userSubscriptions == null || userSubscriptions.size() == 0) {
+			return "You have no subscriptions.";
+		}
+		
+		for(String s : userSubscriptions) {
+			returnText += "==> " + s + "\n";
+		}
+		
+		
+		return returnText;
 	}
 	
 	@RequestMapping(value = "sale/subscribe/{username}/{product}", method = RequestMethod.GET)
@@ -93,9 +111,20 @@ public class SupermarketController {
 	}
 	
 	
-	
-	
-	
+	@RequestMapping(value = "sale/unsubscribe/{username}/{product}", method = RequestMethod.GET)
+	public String unsubscribeProduct(@PathVariable("username") String username, @PathVariable("product") String product) throws RestRequestException {		
+		if(!UserManager.checkIfUserExists(username)) {
+			return "This user does not exists.";
+		}
+		
+		if(!UserManager.getUserSubscriptions(username).contains(product)) {
+			return "You are not subscribed to this product.";
+		}
+
+		UserManager.removeSubscriptionFromUser(username, product);
+
+		return "You won't recieve news about " + product + ".";
+	}	
 	
 	@RequestMapping(value = "updateProduct", method = RequestMethod.POST)
 	public void newSale(@RequestBody JsonNode body) {
@@ -111,14 +140,14 @@ public class SupermarketController {
 	
 	@RequestMapping(value = "getUpdates/{username}", method = RequestMethod.GET)
 	public String getUpdates(@PathVariable("username") String username) {
-		String returnText = "";
+		String returnText = "[NEW UPDATE]: ";
 		
 		if(!UserManager.checkIfUserExists(username)) {
 			return "This user does not exists.";
 		};
 		
 		if(UserManager.getUserUpdates(username) == null) {
-			return returnText;
+			return "";
 		}
 		
 		for(String update : UserManager.getUserUpdates(username)) {
