@@ -16,14 +16,23 @@ import br.imd.rest.expections.RestRequestException;
 
 public class HttpUtils {
 
+	//@ spec_public
 	private final CloseableHttpClient httpClient;
 
+	//@ requires true;
+	//@ ensures httpClient != null;
 	public HttpUtils() {
 		httpClient = HttpClientBuilder.create().build();
 	}
 
-	//@ requires expectStatus > 0;
+	//@ requires expectStatus >= 100;
+	//@ requires expectStatus <= 599;
+	//@ requires headerParams != null ==> (\forall String key; headerParams.containsKey(key); key != null);
+	//@ requires headerParams != null ==> (\forall String value; headerParams.containsValue(value); value != null);
 	//@ requires uri != null;
+	//@ requires uri.matches("http://.*") || uri.matches("https://.*");
+	//@ signals_only RestRequestException;
+	//@ ensures \result != null;
 	public String httpPostRequest(String uri, Map<String, String> headerParams, String body, int expectStatus) throws RestRequestException {
 		try {
 			HttpPost request = new HttpPost(uri);
@@ -45,10 +54,7 @@ public class HttpUtils {
 			for (Map.Entry<String, String> entry : headerParams.entrySet()) {
 				String header = entry.getKey();
 				String value = entry.getValue();
-
-				if (header != null && value != null) {
-					request.addHeader(header, value);
-				}
+				request.addHeader(header, value);
 			}
 
 			if (body != null) {
@@ -70,8 +76,11 @@ public class HttpUtils {
 		}
 	}
 
-
+	//@ requires headerParams != null ==> (\forall String key; headerParams.containsKey(key); key != null);
+	//@ requires headerParams != null ==> (\forall String value; headerParams.containsValue(value); value != null);
 	//@ requires uri != null;
+	//@ requires uri.matches("http://.*") || uri.matches("https://.*");
+	//@ signals_only RestRequestException;
 	//@ ensures \result != null;
 	public String httpGetRequest(String uri, Map<String, String> headerParams) throws RestRequestException {
 
