@@ -103,7 +103,7 @@ public class Client {
 	//@ requires true;
 	//@ ensures true;
 	//@ signals_only RestRequestException;
-	//@ signals (RestRequestException) false;
+	// @ signals (RestRequestException) false;
 	public static void listSales() throws RestRequestException {
 		String uri = "http://localhost:8080/Supermarket/sale/listSales";
 		String response = httpUtils.httpGetRequest(uri, headerParams);

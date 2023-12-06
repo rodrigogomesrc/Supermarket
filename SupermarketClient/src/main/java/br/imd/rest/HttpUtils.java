@@ -31,7 +31,7 @@ public class HttpUtils {
 	//@ requires headerParams != null ==> (\forall String value; headerParams.containsValue(value); value != null);
 	//@ requires uri != null;
 	//@ requires uri.matches("http://.*") || uri.matches("https://.*");
-	//@ signals_only RestRequestException;
+	// @ signals_only RestRequestException;
 	//@ ensures \result != null;
 	public String httpPostRequest(String uri, Map<String, String> headerParams, String body, int expectStatus) throws RestRequestException {
 		try {
@@ -76,7 +76,7 @@ public class HttpUtils {
 		}
 	}
 
-	//@ requires headerParams != null ==> (\forall String key; headerParams.containsKey(key); key != null);
+	// @ requires headerParams != null ==> (\forall String key; headerParams.containsKey(key); key != null);
 	//@ requires headerParams != null ==> (\forall String value; headerParams.containsValue(value); value != null);
 	//@ requires uri != null;
 	//@ requires uri.matches("http://.*") || uri.matches("https://.*");
