@@ -17,27 +17,38 @@ import Rest.Exceptions.RestRequestException;
 
 public class HttpUtils {
 
+	//@ spec_public
+	private final CloseableHttpClient httpClient;
+
+	//@ requires true;
+	//@ ensures httpClient != null;
 	public HttpUtils() {
+		httpClient = HttpClientBuilder.create().build();
 	}
 
-	public static String httpPostRequest(String uri, Map<String, String> headerParams,
-			String body, int expectStatus) throws RestRequestException {
-
+	//@ requires expectStatus >= 100;
+	//@ requires expectStatus <= 599;
+	//@ requires headerParams != null ==> (\forall String key; headerParams.containsKey(key); key != null);
+	//@ requires headerParams != null ==> (\forall String value; headerParams.containsValue(value); value != null);
+	//@ requires uri != null;
+	//@ requires uri.matches("http://.*") || uri.matches("https://.*");
+	// @ signals_only RestRequestException;
+	//@ ensures \result != null;
+	public String httpPostRequest(String uri, Map<String, String> headerParams, String body, int expectStatus) throws RestRequestException {
 		try {
-			CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 			HttpPost request = new HttpPost(uri);
 
-			if (headerParams != null) {
-
-				for (String header : headerParams.keySet()) {
-					request.addHeader(header, headerParams.get(header));
-				}
+			for (Map.Entry<String, String> entry : headerParams.entrySet()) {
+				String header = entry.getKey();
+				String value = entry.getValue();
+				request.addHeader(header, value);
 			}
 
 			if (body != null) {
 				StringEntity bodyEntity = new StringEntity(body, "UTF-8");
 				request.setEntity(bodyEntity);
 			}
+
 			HttpResponse response = httpClient.execute(request);
 
 			if (response.getStatusLine().getStatusCode() != expectStatus) {
@@ -45,23 +56,25 @@ public class HttpUtils {
 			}
 
 			HttpEntity entity = response.getEntity();
-			String responseString = EntityUtils.toString(entity, "UTF-8");
-
-			return responseString;
+			return EntityUtils.toString(entity, "UTF-8");
 
 		} catch (IOException e) {
 			throw new RestRequestException(e.getMessage());
 		}
 	}
 
-	public static String httpGetRequest(String uri, Map<String, String> headerParams) throws RestRequestException {
+	// @ requires headerParams != null ==> (\forall String key; headerParams.containsKey(key); key != null);
+	//@ requires headerParams != null ==> (\forall String value; headerParams.containsValue(value); value != null);
+	//@ requires uri != null;
+	//@ requires uri.matches("http://.*") || uri.matches("https://.*");
+	//@ signals_only RestRequestException;
+	//@ ensures \result != null;
+	public String httpGetRequest(String uri, Map<String, String> headerParams) throws RestRequestException {
 
 		try {
-			CloseableHttpClient httpClient = HttpClientBuilder.create().build();
 			HttpGet request = new HttpGet(uri);
 
 			if (headerParams != null) {
-
 				for (String header : headerParams.keySet()) {
 					request.addHeader(header, headerParams.get(header));
 				}
@@ -74,13 +87,10 @@ public class HttpUtils {
 			}
 
 			HttpEntity entity = response.getEntity();
-			String responseString = EntityUtils.toString(entity, "UTF-8");
-
-			return responseString;
+			return EntityUtils.toString(entity, "UTF-8");
 
 		} catch (IOException e) {
 			throw new RestRequestException(e.getMessage());
 		}
 	}
-
 }

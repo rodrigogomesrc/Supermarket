@@ -37,20 +37,6 @@ public class HttpUtils {
 		try {
 			HttpPost request = new HttpPost(uri);
 
-			/*
-			if (headerParams != null) {
-				for (Map.Entry<String, String> entry : headerParams.entrySet()) {
-					String header = entry.getKey();
-					String value = entry.getValue();
-
-					if (header != null && value != null) {
-						request.addHeader(header, value);
-					}
-				}
-			}
-
-			 */
-
 			for (Map.Entry<String, String> entry : headerParams.entrySet()) {
 				String header = entry.getKey();
 				String value = entry.getValue();

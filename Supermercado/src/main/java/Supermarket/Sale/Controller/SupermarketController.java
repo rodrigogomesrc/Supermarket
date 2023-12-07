@@ -20,9 +20,13 @@ import Supermarket.User.UserManager;
 public class SupermarketController {
 	
 	static Map<String, String> headerParams = new HashMap<String, String>();
+
+	//@ spec_public
+	static HttpUtils httpUtils;
 	
 	public SupermarketController() {
 		headerParams.put("accept", "application/json");
+		httpUtils = new HttpUtils();
 	}
 	
 	@RequestMapping(value = "user/add/{username}", method = RequestMethod.GET)
@@ -39,7 +43,7 @@ public class SupermarketController {
 	@RequestMapping(value = "sale/listSales", method = RequestMethod.GET)
 	public String listSales() throws RestRequestException {
 		String uri = "http://127.0.0.1:1026/v2/entities?type=Sale";
-		String response = HttpUtils.httpGetRequest(uri, headerParams);
+		String response = httpUtils.httpGetRequest(uri, headerParams);
 		
 		System.out.println(response);
 		
@@ -101,7 +105,7 @@ public class SupermarketController {
 			Map<String, String> localHeaderParams = new HashMap<String, String>();
 			localHeaderParams.put("accept", "application/json");
 			localHeaderParams.put("Content-Type", "application/json");
-			String response = HttpUtils.httpPostRequest(uri, localHeaderParams, body, 200);
+			String response = httpUtils.httpPostRequest(uri, localHeaderParams, body, 200);
 			System.out.println(response);
 		}
 		
@@ -128,10 +132,6 @@ public class SupermarketController {
 	
 	@RequestMapping(value = "updateProduct", method = RequestMethod.POST)
 	public void newSale(@RequestBody JsonNode body) {
-		//System.out.println("ProductAdded: ");
-		//System.out.println(body.toPrettyString());
-		//System.out.println("New price: " + body.get("contextResponses").get(0).get("contextElement").get("attributes").get(1).get("value"));
-		
 		String product = body.get("contextResponses").get(0).get("contextElement").get("attributes").get(0).get("value").toString();
 		String price = body.get("contextResponses").get(0).get("contextElement").get("attributes").get(1).get("value").toString();
 	
