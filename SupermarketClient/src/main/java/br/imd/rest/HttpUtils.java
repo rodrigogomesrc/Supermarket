@@ -19,8 +19,9 @@ public class HttpUtils {
 	//@ spec_public
 	private final CloseableHttpClient httpClient;
 
-	//@ requires true;
+	//@ public normal_behaviour
 	//@ ensures httpClient != null;
+	//@ pure
 	public HttpUtils() {
 		httpClient = HttpClientBuilder.create().build();
 	}
@@ -61,7 +62,6 @@ public class HttpUtils {
 	}
 
 	//@ requires uri != null;
-	//@ signals_only RestRequestException;
 	//@ ensures \result != null;
 	public String httpGetRequest(String uri, Map<String, String> headerParams) throws RestRequestException {
 

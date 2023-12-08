@@ -18,13 +18,15 @@ public class Client {
 	static int option = -1;
 
 	//@ spec_public
-	static HttpUtils httpUtils = new HttpUtils();
+	static HttpUtils httpUtils;
 
-	//@ ensures headerParams != null && headerParams.containsKey("accept") && headerParams.containsValue("application/json");
+	//@ ensures headerParams != null;
+	//@ ensures httpUtils != null;
 	//@ pure
 	public Client() {
 		headerParams = new HashMap<String, String>();
 		headerParams.put("accept", "application/json");
+		httpUtils = new HttpUtils();
 	}
 
 	//@ requires args != null;
@@ -61,7 +63,6 @@ public class Client {
 				System.out.println("Inform the name of the product you want to receive updates for: ");
 				product = sc.nextLine();
 				//@ assert product != null;
-				// @ assert product.length() >= 2;
 				subscribeProduct(product);
 			}
 			else if(option == 4) {
@@ -69,14 +70,14 @@ public class Client {
 				System.out.println("Inform the name of the product you want to stop receiving updates for: ");
 				product = sc.nextLine();
 				//@ assert product != null;
-				// @ assert product.length() >= 2;
 				unsubscribeProduct(product);
 			}
 		}
 	}
 
-	//@ requires true;
-	//@ assigns username;
+	//@ requires username != null;
+	//@ requires headerParams != null;
+	//@ requires httpUtils != null;
 	public void setUsername() throws RestRequestException {
 		@SuppressWarnings("resource")
 		Scanner sc = new Scanner(System.in);
@@ -102,6 +103,8 @@ public class Client {
 		username = _username;
 	}
 
+	//@ requires headerParams != null;
+	//@ requires httpUtils != null;
 	public static void listSales() throws RestRequestException {
 		String uri = "http://localhost:8080/Supermarket/sale/listSales";
 		String response = httpUtils.httpGetRequest(uri, headerParams);
@@ -110,6 +113,8 @@ public class Client {
 	}
 
 	//@ requires username != null;
+	//@ requires headerParams != null;
+	//@ requires httpUtils != null;
 	public static void listSubscriptions() throws RestRequestException {
 		String uri = "http://localhost:8080/Supermarket/sale/listSubscriptions/"+username;
 		String response = httpUtils.httpGetRequest(uri, headerParams);
@@ -119,7 +124,8 @@ public class Client {
 
 	//@ requires product != null;
 	//@ requires username != null;
-	//@ ensures true;
+	//@ requires headerParams != null;
+	//@ requires httpUtils != null;
 	public static void subscribeProduct(String product) throws RestRequestException {
 		String uri = "http://localhost:8080/Supermarket/sale/subscribe/"
 				+ username + "/"
@@ -131,6 +137,8 @@ public class Client {
 
 	//@ requires product != null;
 	//@ requires username != null;
+	//@ requires headerParams != null;
+	//@ requires httpUtils != null;
 	public static void unsubscribeProduct(String product) throws RestRequestException {
 		String uri = "http://localhost:8080/Supermarket/sale/unsubscribe/"
 				+ username + "/"
@@ -142,6 +150,8 @@ public class Client {
 
 	//@ requires groupname != null && message != null;
 	//@ requires username != null;
+	//@ requires headerParams != null;
+	//@ requires httpUtils != null;
 	public static void sendMessage(String groupname, String message) throws RestRequestException {
 		message = message.replaceAll(" ", "+");
 
@@ -155,7 +165,7 @@ public class Client {
 
 		String uri = "http://localhost:8080/Supermarket/getUpdates/"
 				+username;
-		//@ also requires true;
+
 		public void run() {
 			while(option != 0) {
 				try {
