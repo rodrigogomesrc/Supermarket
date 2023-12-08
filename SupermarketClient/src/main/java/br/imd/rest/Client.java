@@ -21,15 +21,13 @@ public class Client {
 	static HttpUtils httpUtils = new HttpUtils();
 
 	//@ ensures headerParams != null && headerParams.containsKey("accept") && headerParams.containsValue("application/json");
+	//@ pure
 	public Client() {
 		headerParams = new HashMap<String, String>();
 		headerParams.put("accept", "application/json");
 	}
 
 	//@ requires args != null;
-	//@ requires true;
-	//@ ensures true;
-	//@ signals_only RestRequestException;
 	public static void main(String[] args) throws RestRequestException {
 		Client restClient = new Client();
 
@@ -42,7 +40,7 @@ public class Client {
 
 		while(option != 0) {
 			System.out.println("==========================================");
-			System.out.println("USER: " + username);
+			System.out.println("USER: ".concat(username));
 			System.out.println("0 - Quit Application.");
 			System.out.println("1 - List Sales.");
 			System.out.println("2 - List Subscriptions.");
@@ -62,20 +60,23 @@ public class Client {
 				String product;
 				System.out.println("Inform the name of the product you want to receive updates for: ");
 				product = sc.nextLine();
+				//@ assert product != null;
+				// @ assert product.length() >= 2;
 				subscribeProduct(product);
 			}
 			else if(option == 4) {
 				String product;
 				System.out.println("Inform the name of the product you want to stop receiving updates for: ");
 				product = sc.nextLine();
+				//@ assert product != null;
+				// @ assert product.length() >= 2;
 				unsubscribeProduct(product);
 			}
 		}
 	}
 
 	//@ requires true;
-	//@ ensures true;
-	//@ signals_only RestRequestException;
+	//@ assigns username;
 	public void setUsername() throws RestRequestException {
 		@SuppressWarnings("resource")
 		Scanner sc = new Scanner(System.in);
@@ -84,6 +85,7 @@ public class Client {
 		System.out.println("Please, inform your username: ");
 		_username = sc.nextLine();
 
+		//@ assert _username != null;
 		String uri = "http://localhost:8080/Supermarket/user/add/"+_username;
 		String response = httpUtils.httpGetRequest(uri, headerParams);
 
@@ -100,10 +102,6 @@ public class Client {
 		username = _username;
 	}
 
-	//@ requires true;
-	//@ ensures true;
-	//@ signals_only RestRequestException;
-	// @ signals (RestRequestException) false;
 	public static void listSales() throws RestRequestException {
 		String uri = "http://localhost:8080/Supermarket/sale/listSales";
 		String response = httpUtils.httpGetRequest(uri, headerParams);
@@ -111,9 +109,7 @@ public class Client {
 		System.out.println(response);
 	}
 
-	//@ requires true;
-	//@ ensures true;
-	//@ signals_only RestRequestException;
+	//@ requires username != null;
 	public static void listSubscriptions() throws RestRequestException {
 		String uri = "http://localhost:8080/Supermarket/sale/listSubscriptions/"+username;
 		String response = httpUtils.httpGetRequest(uri, headerParams);
@@ -122,9 +118,8 @@ public class Client {
 	}
 
 	//@ requires product != null;
-	//@ requires product.length() >= 2;
+	//@ requires username != null;
 	//@ ensures true;
-	//@ signals_only RestRequestException;
 	public static void subscribeProduct(String product) throws RestRequestException {
 		String uri = "http://localhost:8080/Supermarket/sale/subscribe/"
 				+ username + "/"
@@ -134,9 +129,8 @@ public class Client {
 		System.out.println(response);
 	}
 
-	//@ requires product != null && product.length() >= 2;
-	//@ ensures true;
-	//@ signals_only RestRequestException;
+	//@ requires product != null;
+	//@ requires username != null;
 	public static void unsubscribeProduct(String product) throws RestRequestException {
 		String uri = "http://localhost:8080/Supermarket/sale/unsubscribe/"
 				+ username + "/"
@@ -147,27 +141,21 @@ public class Client {
 	}
 
 	//@ requires groupname != null && message != null;
-	//@ requires groupname.length() >= 2;
-	//@ ensures true;
-	//@ signals_only RestRequestException;
+	//@ requires username != null;
 	public static void sendMessage(String groupname, String message) throws RestRequestException {
 		message = message.replaceAll(" ", "+");
 
 		String uri = "http://localhost:8080/RestServer/restapi/groupServer/sendMessage"
 				+ "?groupname="+groupname+"&username="+username+"&message="+message;
 		String response = httpUtils.httpGetRequest(uri, headerParams);
-
 		System.out.println(response);
 	}
 
-	private class MessageListener extends Thread{
+	private class MessageListener extends Thread {
 
 		String uri = "http://localhost:8080/Supermarket/getUpdates/"
 				+username;
-
 		//@ also requires true;
-		//@ ensures true;
-		//@ signals_only InterruptedException;
 		public void run() {
 			while(option != 0) {
 				try {
